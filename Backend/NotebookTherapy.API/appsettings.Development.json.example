@@ -1,0 +1,26 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=NotebookTherapyDb;Trusted_Connection=True;MultipleActiveResultSets=true"
+  },
+  "Jwt": {
+    "Key": "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!",
+    "Issuer": "NotebookTherapyAPI",
+    "Audience": "NotebookTherapyClient"
+  },
+  "Stripe": {
+    "SecretKey": "sk_test_replace_me",
+    "WebhookSecret": "whsec_replace_me"
+  },
+  "FileStorage": {
+    "RootPath": "storage",
+    "PublicBaseUrl": "",
+    "SigningKey": "change-me",
+    "SignedUrlTtlMinutes": 10080
+  }
+}

@@ -1,0 +1,38 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.log
+.vs/
+.vscode/
+*.csproj.user
+
+## React
+node_modules/
+dist/
+build/
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+## Database
+*.db
+*.db-shm
+*.db-wal
+appsettings.Development.json
+
+## IDE
+.idea/
+*.swp
+*.swo
+*~
