@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace NotebookTherapy.Application.Features.Users.Handlers;
 
-public class UserCommandHandlers : IRequestHandler<UpdateUserRoleCommand, bool>, IRequestHandler<UpdateUserAdminCommand, bool>
+public class UserCommandHandlers :
+    IRequestHandler<UpdateUserRoleCommand, bool>,
+    IRequestHandler<UpdateUserAdminCommand, bool>,
+    IRequestHandler<UpdateProfileCommand, bool>
 {
     private readonly IUnitOfWork _uow;
     private readonly IMemoryCache _cache;
@@ -49,6 +52,24 @@ public class UserCommandHandlers : IRequestHandler<UpdateUserRoleCommand, bool>,
         await _uow.SaveChangesAsync();
         _cache.Remove(AllUsersKey);
         _cache.Remove($"user_{request.UserId}");
+        return true;
+    }
+
+    public async Task<bool> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
+    {
+        var user = await _uow.Users.GetByIdAsync(request.UserId);
+        if (user == null) return false;
+
+        user.FirstName = request.Dto.FirstName;
+        user.LastName = request.Dto.LastName;
+        user.PhoneNumber = request.Dto.PhoneNumber;
+
+        await _uow.Users.UpdateAsync(user);
+        await _uow.SaveChangesAsync();
+
+        _cache.Remove($"user_{request.UserId}");
+        _cache.Remove(AllUsersKey);
+
         return true;
     }
 }

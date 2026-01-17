@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { productApi } from '../../services/api'
 
-interface Product {
+export interface Product {
   id: number
   name: string
   description: string
@@ -92,9 +92,9 @@ const productSlice = createSlice({
       })
       .addMatcher(
         (action) => action.type.endsWith('/rejected'),
-        (state, action) => {
+        (state, action: any) => {
           state.isLoading = false
-          state.error = action.error.message || 'An error occurred'
+          state.error = action.error?.message || 'An error occurred'
         }
       )
   },

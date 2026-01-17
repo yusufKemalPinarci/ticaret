@@ -22,4 +22,5 @@ public class Product : BaseEntity
     public List<CartItem> CartItems { get; set; } = new();
     public List<OrderItem> OrderItems { get; set; } = new();
     public List<ProductVariant> Variants { get; set; } = new();
+    public List<Review> Reviews { get; set; } = new();
 }

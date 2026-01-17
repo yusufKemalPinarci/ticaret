@@ -48,9 +48,18 @@ builder.Services.AddSwaggerGen(c =>
 var defaultConn = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-// Use SQL Server for all environments to keep schema/migrations consistent
+// Use SQLite for development environment, SQL Server otherwise
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(defaultConn));
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        options.UseSqlite("Data Source=notebooktherapy.db");
+    }
+    else
+    {
+        options.UseSqlServer(defaultConn);
+    }
+});
 
 // Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
