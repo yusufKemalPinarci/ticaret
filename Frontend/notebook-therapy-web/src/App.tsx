@@ -19,8 +19,24 @@ import CheckoutSuccessPage from './pages/CheckoutSuccessPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
+import ProfilePage from './pages/ProfilePage'
+import MyOrdersPage from './pages/MyOrdersPage'
+import WishlistPage from './pages/WishlistPage'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from './store/store'
+import { fetchWishlist } from './store/slices/wishlistSlice'
 
 function App() {
+  const dispatch = useDispatch<AppDispatch>()
+  const { user } = useSelector((state: RootState) => state.auth)
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchWishlist())
+    }
+  }, [user, dispatch])
+
   return (
     <ErrorBoundary>
       <Layout>
@@ -36,6 +52,9 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/orders" element={<MyOrdersPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
           <Route path="/admin/products" element={<RequireAdmin><AdminProducts /></RequireAdmin>} />
           <Route path="/admin/categories" element={<RequireAdmin><AdminCategories /></RequireAdmin>} />

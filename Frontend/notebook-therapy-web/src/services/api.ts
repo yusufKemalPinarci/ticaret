@@ -76,9 +76,10 @@ api.interceptors.response.use(
     const original = error.config as AxiosRequestConfig & { _retry?: boolean }
     if (error.response?.status === 429) {
       const retryAfter = Number(error.response.headers?.['retry-after'] ?? 0) || undefined
+      const data = error.response.data as any;
       publishNotice({
         kind: 'rate-limit',
-        message: error.response.data?.message || 'Çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin.',
+        message: data?.message || 'Çok fazla istek gönderdiniz. Lütfen biraz bekleyip tekrar deneyin.',
         retryAfterSeconds: retryAfter,
       })
     }
@@ -127,6 +128,41 @@ api.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
+export const reviewApi = {
+  getByProduct: async (productId: number) => {
+    const response = await api.get(`/productreviews/product/${productId}`)
+    return response.data
+  },
+  create: async (data: { productId: number; rating: number; comment: string }) => {
+    const response = await api.post('/productreviews', data)
+    return response.data
+  },
+}
+
+export const wishlistApi = {
+  get: async () => {
+    const response = await api.get('/wishlist')
+    return response.data
+  },
+  add: async (productId: number) => {
+    await api.post(`/wishlist/${productId}`)
+  },
+  remove: async (productId: number) => {
+    await api.delete(`/wishlist/${productId}`)
+  },
+}
+
+export const userApi = {
+  getMe: async () => {
+    const response = await api.get('/users/me')
+    return response.data
+  },
+  updateProfile: async (data: { firstName: string; lastName: string; phoneNumber?: string }) => {
+    const response = await api.put('/users/profile', data)
+    return response.data
+  },
+}
 
 export const fileApi = {
   upload: async (file: File) => {
@@ -282,6 +318,10 @@ export const authApi = {
 }
 
 export const ordersApi = {
+  getMyOrders: async () => {
+    const response = await api.get('/orders/my')
+    return response.data
+  },
   checkout: async (payload: any) => {
     const response = await api.post('/orders/checkout', payload)
     return response.data

@@ -16,6 +16,8 @@ public interface IUnitOfWork : IDisposable
     ITaxRateRepository TaxRates { get; }
     IRefreshTokenRepository RefreshTokens { get; }
     IAuditLogRepository AuditLogs { get; }
+    IReviewRepository Reviews { get; }
+    IWishlistRepository Wishlist { get; }
     
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

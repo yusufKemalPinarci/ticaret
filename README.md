@@ -1,4 +1,4 @@
-# NotebookTherapy E-Commerce Platform
+# HediyeJoy E-Ticaret Platformu
 
 Modern e-ticaret platformu - .NET Core Backend + React Frontend
 

@@ -81,6 +81,17 @@ public class OrdersController : ControllerBase
         return Ok(intent);
     }
 
+    [Authorize]
+    [HttpGet("my")]
+    public async Task<ActionResult<IEnumerable<OrderDto>>> GetMyOrders()
+    {
+        var userId = GetUserId();
+        if (!userId.HasValue) return Unauthorized();
+
+        var orders = await _mediator.Send(new GetMyOrdersQuery(userId.Value));
+        return Ok(orders);
+    }
+
     private int? GetUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

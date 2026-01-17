@@ -12,7 +12,8 @@ namespace NotebookTherapy.Application.Features.Orders.Handlers;
 
 public class OrderQueryHandlers :
     IRequestHandler<NotebookTherapy.Application.Features.Orders.GetAllOrdersQuery, IEnumerable<OrderDto>>,
-    IRequestHandler<NotebookTherapy.Application.Features.Orders.GetOrderByIdQuery, OrderDto?>
+    IRequestHandler<NotebookTherapy.Application.Features.Orders.GetOrderByIdQuery, OrderDto?>,
+    IRequestHandler<NotebookTherapy.Application.Features.Orders.GetMyOrdersQuery, IEnumerable<OrderDto>>
 {
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
@@ -48,5 +49,17 @@ public class OrderQueryHandlers :
         var dto = _mapper.Map<OrderDto>(order);
         _cache.Set(key, dto, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = System.TimeSpan.FromMinutes(10) });
         return dto;
+    }
+
+    public async Task<IEnumerable<OrderDto>> Handle(NotebookTherapy.Application.Features.Orders.GetMyOrdersQuery request, CancellationToken cancellationToken)
+    {
+        var key = $"orders_user_{request.UserId}";
+        if (_cache.TryGetValue(key, out IEnumerable<OrderDto> cached))
+            return cached;
+
+        var orders = await _uow.Orders.GetOrdersByUserIdAsync(request.UserId);
+        var dtos = orders.Select(o => _mapper.Map<OrderDto>(o)).ToList();
+        _cache.Set(key, dtos, new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = System.TimeSpan.FromMinutes(5) });
+        return dtos;
     }
 }

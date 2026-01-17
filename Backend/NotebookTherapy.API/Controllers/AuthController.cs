@@ -22,6 +22,7 @@ public class AuthController : ControllerBase
     private readonly IJwtService _jwtService;
     private readonly IMemoryCache _cache;
     private readonly ILogger<AuthController> _logger;
+    private readonly IEmailService _emailService;
     private const int MaxFailedAttempts = 5;
     private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromMinutes(30);
@@ -31,12 +32,13 @@ public class AuthController : ControllerBase
     private static readonly TimeSpan ResetTokenLifetime = TimeSpan.FromHours(1);
     private static readonly TimeSpan EmailVerifyTokenLifetime = TimeSpan.FromDays(1);
 
-    public AuthController(IUnitOfWork unitOfWork, IJwtService jwtService, IMemoryCache cache, ILogger<AuthController> logger)
+    public AuthController(IUnitOfWork unitOfWork, IJwtService jwtService, IMemoryCache cache, ILogger<AuthController> logger, IEmailService emailService)
     {
         _unitOfWork = unitOfWork;
         _jwtService = jwtService;
         _cache = cache;
         _logger = logger;
+        _emailService = emailService;
     }
 
     [HttpPost("forgot-password")]
@@ -54,7 +56,15 @@ public class AuthController : ControllerBase
         var cacheKey = GetResetCacheKey(user.Email);
         _cache.Set(cacheKey, token, ResetTokenLifetime);
 
-        // TODO: e-posta gönderimi entegrasyonu
+        try
+        {
+            await _emailService.SendAsync(user.Email, "Şifre Sıfırlama", $"Şifrenizi sıfırlamak için kodunuz: <b>{token}</b>");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send password reset email to {Email}", user.Email);
+        }
+
         _logger.LogInformation("Password reset token generated for {Email}: {Token}", user.Email, token);
 
         return Ok();
@@ -103,7 +113,15 @@ public class AuthController : ControllerBase
         var cacheKey = GetVerifyCacheKey(user.Email);
         _cache.Set(cacheKey, token, EmailVerifyTokenLifetime);
 
-        // TODO: e-posta gönderimi entegrasyonu
+        try
+        {
+            await _emailService.SendAsync(user.Email, "E-posta Doğrulama", $"E-postanızı doğrulamak için kodunuz: <b>{token}</b>");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send verification email to {Email}", user.Email);
+        }
+
         _logger.LogInformation("Email verify token generated for {Email}: {Token}", user.Email, token);
         return Ok();
     }
