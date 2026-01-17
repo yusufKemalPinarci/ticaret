@@ -173,8 +173,17 @@ export default function AdminProducts() {
             <input className="input" placeholder="Örn: Lavanta Kokulu Mum" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Kategori ID</label>
-            <input className="input" placeholder="Örn: 1" type="number" value={form.categoryId} onChange={e => setForm({ ...form, categoryId: Number(e.target.value) })} />
+            <label className="text-sm font-medium">Kategori</label>
+            <select
+              className="input"
+              value={form.categoryId || ''}
+              onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
+            >
+              <option value="">Kategori seçin</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
           </div>
         </div>
 

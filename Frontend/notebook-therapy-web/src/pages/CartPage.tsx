@@ -83,7 +83,7 @@ export default function CartPage() {
                       +
                     </button>
                   </div>
-                  <p className="text-primary-600 font-bold">${item.totalPrice.toFixed(2)}</p>
+                  <p className="text-primary-600 font-bold">₺{item.totalPrice.toFixed(2)}</p>
                 </div>
               </div>
               <button
@@ -106,7 +106,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between">
                 <span>Ara Toplam:</span>
-                <span>${totalAmount.toFixed(2)}</span>
+                <span>₺{totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Kargo:</span>
@@ -115,7 +115,7 @@ export default function CartPage() {
               <div className="border-t pt-2 mt-2">
                 <div className="flex justify-between text-xl font-bold">
                   <span>Toplam:</span>
-                  <span>${totalAmount.toFixed(2)}</span>
+                  <span>₺{totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </div>

@@ -1,36 +1,23 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../store/store'
 import { fetchProductById, fetchProducts } from '../store/slices/productSlice'
 import { addToCart } from '../store/slices/cartSlice'
-import { ShoppingCart, Star, MessageSquare, Heart } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 import PageMeta from '../components/PageMeta'
 import Skeleton from '../components/Skeleton'
-import { reviewApi } from '../services/api'
-import { publishNotice } from '../services/notifications'
-import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice'
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const dispatch = useDispatch<AppDispatch>()
   const { currentProduct, isLoading, products } = useSelector((state: RootState) => state.products)
-  const { user } = useSelector((state: RootState) => state.auth)
-  const isWishlisted = useSelector((state: RootState) =>
-    state.wishlist.items.some(item => item.productId === (currentProduct?.id || 0))
-  )
   const [quantity, setQuantity] = useState(1)
-  const [reviews, setReviews] = useState<any[]>([])
-  const [isReviewsLoading, setIsReviewsLoading] = useState(true)
-  const [newReviewRating, setNewReviewRating] = useState(5)
-  const [newReviewComment, setNewReviewComment] = useState('')
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
 
   useEffect(() => {
     if (id) {
       dispatch(fetchProductById(parseInt(id)))
-      loadReviews(parseInt(id))
     }
     if (!products || products.length === 0) {
       dispatch(fetchProducts())
@@ -44,40 +31,10 @@ export default function ProductDetailPage() {
       .slice(0, 4)
   }, [products, currentProduct])
 
-  const loadReviews = async (productId: number) => {
-    setIsReviewsLoading(true)
-    try {
-      const data = await reviewApi.getByProduct(productId)
-      setReviews(data)
-    } catch (err) {
-      // ignore
-    } finally {
-      setIsReviewsLoading(false)
-    }
-  }
-
   const handleAddToCart = () => {
     if (currentProduct) {
       dispatch(addToCart({ productId: currentProduct.id, quantity }))
       navigate('/cart')
-    }
-  }
-
-  const handleWishlist = async () => {
-    if (!user || !currentProduct) {
-      publishNotice({ kind: 'warning', message: 'İstek listesi için giriş yapmalısınız.' })
-      return
-    }
-    try {
-      if (isWishlisted) {
-        await dispatch(removeFromWishlist(currentProduct.id)).unwrap()
-        publishNotice({ kind: 'success', message: 'İstek listesinden çıkarıldı.' })
-      } else {
-        await dispatch(addToWishlist(currentProduct.id)).unwrap()
-        publishNotice({ kind: 'success', message: 'İstek listesine eklendi.' })
-      }
-    } catch (err) {
-      publishNotice({ kind: 'warning', message: 'İşlem başarısız oldu.' })
     }
   }
 
@@ -130,11 +87,11 @@ export default function ProductDetailPage() {
           <div className="mb-4">
             <div className="flex items-center space-x-2 mb-2">
               <span className="text-3xl font-bold text-primary-600">
-                ${displayPrice.toFixed(2)}
+            ₺{displayPrice.toFixed(2)}
               </span>
               {originalPrice && (
                 <span className="text-xl text-gray-500 line-through">
-                  ${originalPrice.toFixed(2)}
+              ₺{originalPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -165,25 +122,14 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <button
-              onClick={handleAddToCart}
-              disabled={currentProduct.stock === 0}
-              className="btn btn-primary flex-1 flex items-center justify-center space-x-2 text-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              <span>Sepete Ekle</span>
-            </button>
-            <button
-              onClick={handleWishlist}
-              className={`btn btn-outline p-3 rounded-lg border-2 transition-colors ${
-                isWishlisted ? 'border-red-500 text-red-500' : 'border-gray-200 text-gray-400'
-              }`}
-              title="İstek listesine ekle"
-            >
-              <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-current' : ''}`} />
-            </button>
-          </div>
+          <button
+            onClick={handleAddToCart}
+            disabled={currentProduct.stock === 0}
+            className="btn btn-primary w-full flex items-center justify-center space-x-2 text-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            <span>Sepete Ekle</span>
+          </button>
 
           {currentProduct.stock === 0 && (
             <p className="text-red-600 mt-2 text-center">Ürün stokta yok</p>
@@ -215,122 +161,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
       )}
-
-      {/* Reviews Section */}
-      <div className="mt-16 border-t pt-12">
-        <h2 className="text-3xl font-bold mb-8 flex items-center gap-2">
-          <MessageSquare className="w-8 h-8 text-primary-600" />
-          Müşteri Değerlendirmeleri
-        </h2>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-1">
-            {user ? (
-              <div className="card p-6 sticky top-24">
-                <h3 className="text-xl font-bold mb-4">Ürünü Değerlendir</h3>
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault()
-                    if (!currentProduct) return
-                    setIsSubmittingReview(true)
-                    try {
-                      const review = await reviewApi.create({
-                        productId: currentProduct.id,
-                        rating: newReviewRating,
-                        comment: newReviewComment,
-                      })
-                      setReviews([review, ...reviews])
-                      setNewReviewComment('')
-                      setNewReviewRating(5)
-                      publishNotice({ kind: 'success', message: 'Yorumunuz için teşekkürler!' })
-                    } catch (err) {
-                      publishNotice({ kind: 'warning', message: 'Yorum gönderilemedi.' })
-                    } finally {
-                      setIsSubmittingReview(false)
-                    }
-                  }}
-                  className="space-y-4"
-                >
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Puanınız</label>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setNewReviewRating(star)}
-                          className="focus:outline-none"
-                        >
-                          <Star
-                            className={`w-8 h-8 ${
-                              star <= newReviewRating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                            }`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Yorumunuz</label>
-                    <textarea
-                      className="input min-h-[100px]"
-                      value={newReviewComment}
-                      onChange={(e) => setNewReviewComment(e.target.value)}
-                      placeholder="Ürün hakkındaki düşüncelerinizi paylaşın..."
-                      required
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary w-full" disabled={isSubmittingReview}>
-                    {isSubmittingReview ? 'Gönderiliyor...' : 'Yorumu Gönder'}
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div className="card p-6 bg-gray-50 text-center sticky top-24">
-                <p className="text-gray-600 mb-4">Yorum yapabilmek için giriş yapmalısınız.</p>
-                <Link to="/login" className="btn btn-outline w-full">Giriş Yap</Link>
-              </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-2">
-            {isReviewsLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-              </div>
-            ) : reviews.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">Henüz yorum yapılmamış. İlk yorumu siz yapın!</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {reviews.map((review) => (
-                  <div key={review.id} className="border-b pb-6 last:border-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <div className="font-bold text-lg">{review.userFullName}</div>
-                        <div className="flex gap-0.5 text-yellow-400 my-1">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-gray-200'}`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(review.createdAt).toLocaleDateString('tr-TR')}
-                      </span>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed">{review.comment}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

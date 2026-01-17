@@ -24,7 +24,6 @@ public class UnitOfWork : IUnitOfWork
     private ITaxRateRepository? _taxRates;
     private IRefreshTokenRepository? _refreshTokens;
     private IAuditLogRepository? _auditLogs;
-    private IReviewRepository? _reviews;
     private IWishlistRepository? _wishlist;
 
     public UnitOfWork(ApplicationDbContext context)
@@ -73,9 +72,6 @@ public class UnitOfWork : IUnitOfWork
 
     public IAuditLogRepository AuditLogs =>
         _auditLogs ??= new AuditLogRepository(_context);
-
-    public IReviewRepository Reviews =>
-        _reviews ??= new ReviewRepository(_context);
 
     public IWishlistRepository Wishlist =>
         _wishlist ??= new WishlistRepository(_context);

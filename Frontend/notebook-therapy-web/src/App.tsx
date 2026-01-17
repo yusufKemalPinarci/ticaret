@@ -11,6 +11,7 @@ import AdminProducts from './pages/admin/AdminProducts'
 import AdminCategories from './pages/admin/AdminCategories'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminUsers from './pages/admin/AdminUsers'
+import AdminCoupons from './pages/admin/AdminCoupons'
 import RequireAdmin from './components/Admin/RequireAdmin'
 import CheckoutPage from './pages/CheckoutPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -60,6 +61,7 @@ function App() {
           <Route path="/admin/categories" element={<RequireAdmin><AdminCategories /></RequireAdmin>} />
           <Route path="/admin/orders" element={<RequireAdmin><AdminOrders /></RequireAdmin>} />
           <Route path="/admin/users" element={<RequireAdmin><AdminUsers /></RequireAdmin>} />
+          <Route path="/admin/coupons" element={<RequireAdmin><AdminCoupons /></RequireAdmin>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>

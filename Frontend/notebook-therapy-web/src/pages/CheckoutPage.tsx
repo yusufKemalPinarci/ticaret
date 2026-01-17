@@ -263,32 +263,32 @@ function CheckoutForm() {
                     <div className="font-medium">{item.productName}</div>
                     <div className="text-sm text-gray-500">{item.quantity} adet</div>
                   </div>
-                  <div className="font-semibold">${item.totalPrice.toFixed(2)}</div>
+                  <div className="font-semibold">₺{item.totalPrice.toFixed(2)}</div>
                 </div>
               ))}
             </div>
             <div className="border-t pt-3 space-y-1 text-sm text-gray-700">
               <div className="flex justify-between">
                 <span>Ara toplam</span>
-                <span>${totalAmount.toFixed(2)}</span>
+                <span>₺{totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Kargo</span>
-                <span>${shippingCost.toFixed(2)}</span>
+                <span>₺{shippingCost.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Vergi (tahmini)</span>
-                <span>${taxAmount.toFixed(2)}</span>
+                <span>₺{taxAmount.toFixed(2)}</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-emerald-700 font-medium">
                   <span>Kupon indirimi</span>
-                  <span>- ${discountAmount.toFixed(2)}</span>
+                  <span>- ₺{discountAmount.toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between text-lg font-semibold pt-2">
                 <span>Genel Toplam</span>
-                <span>${(totalAmount + shippingCost + taxAmount - discountAmount).toFixed(2)}</span>
+                <span>₺{(totalAmount + shippingCost + taxAmount - discountAmount).toFixed(2)}</span>
               </div>
             </div>
           </div>

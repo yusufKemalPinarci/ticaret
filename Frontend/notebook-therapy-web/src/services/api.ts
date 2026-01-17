@@ -129,17 +129,6 @@ api.interceptors.response.use(
   }
 )
 
-export const reviewApi = {
-  getByProduct: async (productId: number) => {
-    const response = await api.get(`/productreviews/product/${productId}`)
-    return response.data
-  },
-  create: async (data: { productId: number; rating: number; comment: string }) => {
-    const response = await api.post('/productreviews', data)
-    return response.data
-  },
-}
-
 export const wishlistApi = {
   get: async () => {
     const response = await api.get('/wishlist')
@@ -169,8 +158,9 @@ export const fileApi = {
     const formData = new FormData()
     formData.append('file', file)
 
+    // Let axios set the boundary for multipart/form-data automatically
     const response = await api.post('/files/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': undefined },
     })
     return response.data as { path: string; url: string }
   },
@@ -329,6 +319,49 @@ export const ordersApi = {
   createPaymentIntent: async (orderId: number, idempotencyKey: string, sessionId?: string) => {
     const response = await api.post(`/orders/${orderId}/payment-intent`, { idempotencyKey, sessionId })
     return response.data
+  },
+  requestRefund: async (orderId: number, data: { reason: string }) => {
+    await api.post(`/orders/${orderId}/refund-request`, data)
+  },
+  downloadInvoice: async (orderId: number) => {
+    const response = await api.get(`/invoices/${orderId}/download`, { responseType: 'blob' })
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `invoice-${orderId}.txt`)
+    document.body.appendChild(link)
+    link.click()
+  },
+}
+
+export const adminApi = {
+  getOrders: async () => {
+    const response = await api.get('/admin/orders')
+    return response.data
+  },
+  updateOrderStatus: async (id: number, status: string) => {
+    await api.put(`/admin/orders/${id}/status`, status)
+  },
+  updateTracking: async (id: number, data: { shippingProvider: string; trackingNumber: string }) => {
+    await api.put(`/admin/orders/${id}/tracking`, data)
+  },
+  handleReturn: async (id: number, data: { approve: boolean }) => {
+    await api.put(`/admin/orders/${id}/refund`, { refundRequested: false, refunded: data.approve })
+  },
+  getStats: async () => {
+    const response = await api.get('/admin/stats')
+    return response.data
+  },
+  getCoupons: async () => {
+    const response = await api.get('/admin/coupons')
+    return response.data
+  },
+  createCoupon: async (data: any) => {
+    const response = await api.post('/admin/coupons', data)
+    return response.data
+  },
+  deleteCoupon: async (id: number) => {
+    await api.delete(`/admin/coupons/${id}`)
   },
 }
 

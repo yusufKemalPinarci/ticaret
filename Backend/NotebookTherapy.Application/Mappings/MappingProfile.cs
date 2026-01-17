@@ -66,8 +66,5 @@ public class MappingProfile : Profile
         CreateMap<CreateTaxRateDto, TaxRate>();
         CreateMap<UpdateTaxRateDto, TaxRate>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-        // Reviews
-        CreateMap<Review, ReviewDto>()
-            .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"));
     }
 }

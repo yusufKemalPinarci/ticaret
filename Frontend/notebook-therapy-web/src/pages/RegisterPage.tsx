@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, Link } from 'react-router-dom'
 import { AppDispatch, RootState } from '../store/store'
 import { register, clearError } from '../store/slices/authSlice'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function RegisterPage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -15,6 +16,7 @@ export default function RegisterPage() {
     firstName: '',
     lastName: '',
   })
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (accessToken) {
@@ -78,14 +80,23 @@ export default function RegisterPage() {
 
           <div>
             <label className="block mb-2 font-semibold">Şifre</label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="input"
-              required
-              minLength={6}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="input pr-10"
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary-600"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
           <button

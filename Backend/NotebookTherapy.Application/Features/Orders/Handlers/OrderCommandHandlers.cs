@@ -710,6 +710,7 @@ public class OrderCommandHandlers :
         var order = await _uow.Orders.GetByIdAsync(request.OrderId);
         if (order == null) return false;
 
+        var oldTracking = order.TrackingNumber;
         order.TrackingNumber = request.Tracking.TrackingNumber?.Trim();
         if (!string.IsNullOrWhiteSpace(request.Tracking.Status))
         {
@@ -720,6 +721,13 @@ public class OrderCommandHandlers :
         await _uow.SaveChangesAsync();
         _cache.Remove(AllOrdersKey);
         _cache.Remove($"order_{request.OrderId}");
+
+        if (!string.IsNullOrWhiteSpace(order.TrackingNumber) && order.TrackingNumber != oldTracking)
+        {
+            var subject = $"Siparişiniz kargoya verildi - {order.OrderNumber}";
+            var body = $"Merhaba,\n\n{order.OrderNumber} numaralı siparişiniz kargoya verilmiştir.\nTakip Numarası: {order.TrackingNumber}";
+            await SendUserEmailAsync(order, subject, body);
+        }
         return true;
     }
 

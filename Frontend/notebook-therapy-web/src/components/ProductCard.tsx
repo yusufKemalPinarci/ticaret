@@ -1,11 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Product } from '../store/slices/productSlice'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../store/store'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../store/store'
 import { addToCart } from '../store/slices/cartSlice'
-import { Heart } from 'lucide-react'
-import { publishNotice } from '../services/notifications'
-import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice'
 
 interface ProductCardProps {
   product: Product
@@ -13,35 +10,11 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const dispatch = useDispatch<AppDispatch>()
-  const { user } = useSelector((state: RootState) => state.auth)
-  const isWishlisted = useSelector((state: RootState) =>
-    state.wishlist.items.some(item => item.productId === product.id)
-  )
   const displayPrice = product.discountPrice || product.price
   const originalPrice = product.discountPrice ? product.price : null
   const srcSet = [360, 540, 720, 960]
     .map((w) => `${product.imageUrl}?w=${w} ${w}w`)
     .join(', ')
-
-  const handleWishlist = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!user) {
-      publishNotice({ kind: 'warning', message: 'İstek listesi için giriş yapmalısınız.' })
-      return
-    }
-    try {
-      if (isWishlisted) {
-        await dispatch(removeFromWishlist(product.id)).unwrap()
-        publishNotice({ kind: 'success', message: 'İstek listesinden çıkarıldı.' })
-      } else {
-        await dispatch(addToWishlist(product.id)).unwrap()
-        publishNotice({ kind: 'success', message: 'İstek listesine eklendi.' })
-      }
-    } catch (err) {
-      publishNotice({ kind: 'warning', message: 'İşlem başarısız oldu.' })
-    }
-  }
 
   return (
     <Link to={`/products/${product.id}`} className="card group relative">
@@ -66,14 +39,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             Tekrar Stokta!
           </span>
         )}
-        <button
-          onClick={handleWishlist}
-          className={`absolute top-2 right-2 p-2 rounded-full shadow-md bg-white transition-colors ${
-            isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
-          }`}
-        >
-          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
-        </button>
       </div>
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
@@ -85,11 +50,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-xl font-bold text-primary-600">
-            ${displayPrice.toFixed(2)}
+            ₺{displayPrice.toFixed(2)}
           </span>
           {originalPrice && (
             <span className="text-sm text-gray-500 line-through">
-              ${originalPrice.toFixed(2)}
+              ₺{originalPrice.toFixed(2)}
             </span>
           )}
         </div>
