@@ -15,6 +15,15 @@ public class User : BaseEntity
     public DateTime? LockoutEndUtc { get; set; }
     public DateTime? LastLoginAt { get; set; }
     
+    // Turkish Government / Legal Fields
+    public bool IsCorporate { get; set; } = false;
+    public string? TcKimlikNo { get; set; }
+    public string? TaxNumber { get; set; }
+    public string? TaxOffice { get; set; }
+    public string? CompanyName { get; set; }
+    public bool KvkkApproved { get; set; } = false;
+    public DateTime? KvkkApprovedDate { get; set; }
+
     // Navigation Properties
     public List<Cart> Carts { get; set; } = new();
     public List<Order> Orders { get; set; } = new();

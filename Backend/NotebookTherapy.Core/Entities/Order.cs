@@ -30,6 +30,14 @@ public class Order : BaseEntity
     public bool Refunded { get; set; }
     public string? AdminNote { get; set; }
     
+    // Turkish Government / Legal / Invoicing Fields
+    public bool IsCorporate { get; set; } = false;
+    public string? TcKimlikNo { get; set; }
+    public string? TaxNumber { get; set; }
+    public string? TaxOffice { get; set; }
+    public string? CompanyName { get; set; }
+    public bool KvkkApproved { get; set; } = false;
+
     // Navigation Properties
     public User User { get; set; } = null!;
     public List<OrderItem> Items { get; set; } = new();

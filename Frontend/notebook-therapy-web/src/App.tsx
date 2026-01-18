@@ -12,6 +12,7 @@ import AdminCategories from './pages/admin/AdminCategories'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminCoupons from './pages/admin/AdminCoupons'
+import AdminCompliance from './pages/admin/AdminCompliance'
 import RequireAdmin from './components/Admin/RequireAdmin'
 import CheckoutPage from './pages/CheckoutPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -23,6 +24,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage'
 import ProfilePage from './pages/ProfilePage'
 import MyOrdersPage from './pages/MyOrdersPage'
 import WishlistPage from './pages/WishlistPage'
+import KvkkPage from './pages/KvkkPage'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from './store/store'
@@ -56,12 +58,14 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/orders" element={<MyOrdersPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/legal/kvkk" element={<KvkkPage />} />
           <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
           <Route path="/admin/products" element={<RequireAdmin><AdminProducts /></RequireAdmin>} />
           <Route path="/admin/categories" element={<RequireAdmin><AdminCategories /></RequireAdmin>} />
           <Route path="/admin/orders" element={<RequireAdmin><AdminOrders /></RequireAdmin>} />
           <Route path="/admin/users" element={<RequireAdmin><AdminUsers /></RequireAdmin>} />
           <Route path="/admin/coupons" element={<RequireAdmin><AdminCoupons /></RequireAdmin>} />
+          <Route path="/admin/compliance" element={<RequireAdmin><AdminCompliance /></RequireAdmin>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>

@@ -78,6 +78,10 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.FailedLoginCount);
             entity.Property(e => e.LockoutEndUtc);
             entity.Property(e => e.LastLoginAt);
+            entity.Property(e => e.TcKimlikNo).HasMaxLength(11);
+            entity.Property(e => e.TaxNumber).HasMaxLength(15);
+            entity.Property(e => e.TaxOffice).HasMaxLength(100);
+            entity.Property(e => e.CompanyName).HasMaxLength(200);
         });
 
         // Cart Configuration
@@ -133,6 +137,10 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.ShippingWeight).HasColumnType("decimal(18,3)");
             entity.Property(e => e.TaxRegion).HasMaxLength(100);
             entity.Property(e => e.InvoiceUrl).HasMaxLength(500);
+            entity.Property(e => e.TcKimlikNo).HasMaxLength(11);
+            entity.Property(e => e.TaxNumber).HasMaxLength(15);
+            entity.Property(e => e.TaxOffice).HasMaxLength(100);
+            entity.Property(e => e.CompanyName).HasMaxLength(200);
             entity.HasMany(e => e.Items)
                   .WithOne(i => i.Order)
                   .HasForeignKey(i => i.OrderId)

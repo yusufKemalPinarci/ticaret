@@ -17,6 +17,7 @@ export default function AdminDashboard() {
     { title: 'Kategoriler', desc: 'Kategori yönetimi', href: '/admin/categories', color: 'bg-purple-500' },
     { title: 'Siparişler', desc: 'Durum ve takip', href: '/admin/orders', color: 'bg-orange-500' },
     { title: 'Kuponlar', desc: 'İndirim yönetimi', href: '/admin/coupons', color: 'bg-rose-500' },
+    { title: 'Yasal Uyum', desc: 'TC/Vergi ve KVKK', href: '/admin/compliance', color: 'bg-emerald-500' },
   ]
 
   return (

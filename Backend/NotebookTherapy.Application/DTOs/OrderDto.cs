@@ -23,6 +23,12 @@ public class OrderDto
     public bool RefundRequested { get; set; }
     public bool Refunded { get; set; }
     public string? AdminNote { get; set; }
+    public bool IsCorporate { get; set; }
+    public string? TcKimlikNo { get; set; }
+    public string? TaxNumber { get; set; }
+    public string? TaxOffice { get; set; }
+    public string? CompanyName { get; set; }
+    public bool KvkkApproved { get; set; }
     public DateTime CreatedAt { get; set; }
     public List<OrderItemDto> Items { get; set; } = new();
 }

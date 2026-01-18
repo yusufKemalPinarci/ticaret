@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NotebookTherapy.Application.Features.Coupons;
 using NotebookTherapy.Application.DTOs;
+using NotebookTherapy.Application.Services;
 using CartEntity = NotebookTherapy.Core.Entities.Cart;
 
 namespace NotebookTherapy.Application.Features.Orders.Handlers;
@@ -273,6 +274,27 @@ public class OrderCommandHandlers :
             var total = subTotal + shipping + tax - discount;
             if (total < 0) total = 0;
 
+        // Legal field validation (Turkey specific)
+        if (string.Equals(shippingRegion, "TR", StringComparison.OrdinalIgnoreCase))
+        {
+            if (request.Checkout.IsCorporate)
+            {
+                if (!IdentityValidator.ValidateTaxNumber(request.Checkout.TaxNumber))
+                {
+                    await _uow.RollbackTransactionAsync();
+                    return null;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(request.Checkout.TcKimlikNo))
+            {
+                if (!IdentityValidator.ValidateTcKimlikNo(request.Checkout.TcKimlikNo))
+                {
+                    await _uow.RollbackTransactionAsync();
+                    return null;
+                }
+            }
+        }
+
             var order = new Order
             {
                 UserId = userId.Value,
@@ -292,6 +314,12 @@ public class OrderCommandHandlers :
                 ShippingAddress = request.Checkout.ShippingAddress,
                 BillingAddress = request.Checkout.BillingAddress,
                 Notes = request.Checkout.Notes,
+            IsCorporate = request.Checkout.IsCorporate,
+            TcKimlikNo = request.Checkout.TcKimlikNo,
+            TaxNumber = request.Checkout.TaxNumber,
+            TaxOffice = request.Checkout.TaxOffice,
+            CompanyName = request.Checkout.CompanyName,
+            KvkkApproved = request.Checkout.KvkkApproved,
                 Items = orderItems
             };
 

@@ -12,23 +12,40 @@ export default function ProfilePage() {
   const [firstName, setFirstName] = useState(user?.firstName || '')
   const [lastName, setLastName] = useState(user?.lastName || '')
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [isCorporate, setIsCorporate] = useState(false)
+  const [tcKimlikNo, setTcKimlikNo] = useState('')
+  const [taxNumber, setTaxNumber] = useState('')
+  const [taxOffice, setTaxOffice] = useState('')
+  const [companyName, setCompanyName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName)
-      setLastName(user.lastName)
-    }
     userApi.getMe().then(data => {
+        setFirstName(data.firstName || '')
+        setLastName(data.lastName || '')
         setPhoneNumber(data.phoneNumber || '')
+        setIsCorporate(data.isCorporate || false)
+        setTcKimlikNo(data.tcKimlikNo || '')
+        setTaxNumber(data.taxNumber || '')
+        setTaxOffice(data.taxOffice || '')
+        setCompanyName(data.companyName || '')
     }).catch(() => {})
-  }, [user])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     try {
-      await userApi.updateProfile({ firstName, lastName, phoneNumber })
+      await userApi.updateProfile({
+        firstName,
+        lastName,
+        phoneNumber,
+        isCorporate,
+        tcKimlikNo: !isCorporate ? tcKimlikNo : '',
+        taxNumber: isCorporate ? taxNumber : '',
+        taxOffice: isCorporate ? taxOffice : '',
+        companyName: isCorporate ? companyName : ''
+      })
       dispatch(setUser({ ...user!, firstName, lastName }))
       publishNotice({ kind: 'success', message: 'Profil başarıyla güncellendi.' })
     } catch (err: any) {
@@ -80,7 +97,51 @@ export default function ProfilePage() {
             placeholder="05xx xxx xx xx"
           />
         </div>
-        <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
+
+        <div className="pt-4 border-t">
+          <h3 className="font-bold mb-3 text-gray-700">Fatura Tercihleri</h3>
+          <div className="flex gap-4 mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" checked={!isCorporate} onChange={() => setIsCorporate(false)} name="billingType" />
+              <span className="text-sm">Bireysel</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" checked={isCorporate} onChange={() => setIsCorporate(true)} name="billingType" />
+              <span className="text-sm">Kurumsal</span>
+            </label>
+          </div>
+
+          {!isCorporate ? (
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-600">TC Kimlik No</label>
+              <input
+                className="input"
+                value={tcKimlikNo}
+                onChange={(e) => setTcKimlikNo(e.target.value)}
+                maxLength={11}
+              />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-600">Firma Adı</label>
+                <input className="input" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-600">Vergi No</label>
+                  <input className="input" value={taxNumber} onChange={(e) => setTaxNumber(e.target.value)} maxLength={11} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-600">Vergi Dairesi</label>
+                  <input className="input" value={taxOffice} onChange={(e) => setTaxOffice(e.target.value)} />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button type="submit" className="btn btn-primary w-full pt-4" disabled={isLoading}>
           {isLoading ? 'Güncelleniyor...' : 'Bilgileri Kaydet'}
         </button>
       </form>

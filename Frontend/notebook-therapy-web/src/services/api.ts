@@ -147,7 +147,17 @@ export const userApi = {
     const response = await api.get('/users/me')
     return response.data
   },
-  updateProfile: async (data: { firstName: string; lastName: string; phoneNumber?: string }) => {
+  updateProfile: async (data: {
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
+    isCorporate?: boolean;
+    tcKimlikNo?: string;
+    taxNumber?: string;
+    taxOffice?: string;
+    companyName?: string;
+    kvkkApproved?: boolean;
+  }) => {
     const response = await api.put('/users/profile', data)
     return response.data
   },

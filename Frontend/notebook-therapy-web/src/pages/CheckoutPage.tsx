@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Elements, CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
+import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { clearCart, fetchCart } from '../store/slices/cartSlice'
 import { ensureCartSessionId, generateIdempotencyKey, ordersApi, cartApi } from '../services/api'
@@ -33,6 +34,14 @@ function CheckoutForm() {
   const [shippingCost, setShippingCost] = useState(0)
   const [taxAmount, setTaxAmount] = useState(0)
   const [requiresAction, setRequiresAction] = useState(false)
+
+  // Government / Legal Fields
+  const [isCorporate, setIsCorporate] = useState(false)
+  const [tcKimlikNo, setTcKimlikNo] = useState('')
+  const [taxNumber, setTaxNumber] = useState('')
+  const [taxOffice, setTaxOffice] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [kvkkApproved, setKvkkApproved] = useState(false)
 
   const sessionId = useMemo(() => ensureCartSessionId(), [])
   const [idempotencyKey, setIdempotencyKey] = useState(generateIdempotencyKey())
@@ -110,6 +119,12 @@ function CheckoutForm() {
         tax: taxAmount,
         shippingRegion: 'TR',
         totalWeight: 0,
+        isCorporate,
+        tcKimlikNo: !isCorporate ? tcKimlikNo : undefined,
+        taxNumber: isCorporate ? taxNumber : undefined,
+        taxOffice: isCorporate ? taxOffice : undefined,
+        companyName: isCorporate ? companyName : undefined,
+        kvkkApproved,
       }
 
       const order = await ordersApi.checkout(payload)
@@ -202,6 +217,64 @@ function CheckoutForm() {
           <div>
             <label className="block text-sm font-medium mb-1">Not</label>
             <textarea className="input" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </div>
+
+          <div className="card p-4 bg-gray-50 space-y-4">
+            <h3 className="font-bold border-b pb-2">Fatura Bilgileri</h3>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" checked={!isCorporate} onChange={() => setIsCorporate(false)} name="billingType" />
+                <span>Bireysel</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="radio" checked={isCorporate} onChange={() => setIsCorporate(true)} name="billingType" />
+                <span>Kurumsal</span>
+              </label>
+            </div>
+
+            {!isCorporate ? (
+              <div>
+                <label className="block text-sm font-medium mb-1">TC Kimlik No (Opsiyonel)</label>
+                <input
+                  className="input"
+                  value={tcKimlikNo}
+                  onChange={(e) => setTcKimlikNo(e.target.value)}
+                  placeholder="11111111111"
+                  maxLength={11}
+                />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Firma Adı</label>
+                  <input className="input" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Vergi Numarası</label>
+                    <input className="input" value={taxNumber} onChange={(e) => setTaxNumber(e.target.value)} required maxLength={11} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Vergi Dairesi</label>
+                    <input className="input" value={taxOffice} onChange={(e) => setTaxOffice(e.target.value)} required />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              id="kvkk"
+              className="mt-1"
+              checked={kvkkApproved}
+              onChange={(e) => setKvkkApproved(e.target.checked)}
+              required
+            />
+            <label htmlFor="kvkk" className="text-sm text-gray-600 cursor-pointer">
+              <Link to="/legal/kvkk" target="_blank" className="text-primary-600 hover:underline">KVKK Aydınlatma Metni</Link>'ni okudum ve kabul ediyorum.
+            </label>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Kupon</label>

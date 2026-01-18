@@ -48,6 +48,13 @@ public class UserCommandHandlers :
         if (request.UpdateDto.VerifyEmail == true)
             user.IsEmailVerified = true;
 
+        if (request.UpdateDto.IsCorporate.HasValue) user.IsCorporate = request.UpdateDto.IsCorporate.Value;
+        if (request.UpdateDto.TcKimlikNo != null) user.TcKimlikNo = request.UpdateDto.TcKimlikNo;
+        if (request.UpdateDto.TaxNumber != null) user.TaxNumber = request.UpdateDto.TaxNumber;
+        if (request.UpdateDto.TaxOffice != null) user.TaxOffice = request.UpdateDto.TaxOffice;
+        if (request.UpdateDto.CompanyName != null) user.CompanyName = request.UpdateDto.CompanyName;
+        if (request.UpdateDto.KvkkApproved.HasValue) user.KvkkApproved = request.UpdateDto.KvkkApproved.Value;
+
         await _uow.Users.UpdateAsync(user);
         await _uow.SaveChangesAsync();
         _cache.Remove(AllUsersKey);
@@ -63,6 +70,18 @@ public class UserCommandHandlers :
         user.FirstName = request.Dto.FirstName;
         user.LastName = request.Dto.LastName;
         user.PhoneNumber = request.Dto.PhoneNumber;
+
+        if (request.Dto.IsCorporate.HasValue) user.IsCorporate = request.Dto.IsCorporate.Value;
+        if (request.Dto.TcKimlikNo != null) user.TcKimlikNo = request.Dto.TcKimlikNo;
+        if (request.Dto.TaxNumber != null) user.TaxNumber = request.Dto.TaxNumber;
+        if (request.Dto.TaxOffice != null) user.TaxOffice = request.Dto.TaxOffice;
+        if (request.Dto.CompanyName != null) user.CompanyName = request.Dto.CompanyName;
+
+        if (request.Dto.KvkkApproved == true && !user.KvkkApproved)
+        {
+            user.KvkkApproved = true;
+            user.KvkkApprovedDate = DateTime.UtcNow;
+        }
 
         await _uow.Users.UpdateAsync(user);
         await _uow.SaveChangesAsync();

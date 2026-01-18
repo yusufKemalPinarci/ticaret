@@ -39,6 +39,8 @@ export default function AdminUsers(){
             <div>
               <div className="font-semibold">{u.email}</div>
               <div className="text-sm text-gray-500">{u.firstName} {u.lastName}</div>
+              {u.tcKimlikNo && <div className="text-[10px] text-gray-400 mt-1">TC: {u.tcKimlikNo}</div>}
+              {u.isCorporate && <div className="text-[10px] text-purple-500 font-bold">KURUMSAL: {u.companyName} ({u.taxNumber})</div>}
             </div>
             <div className="flex items-center space-x-2">
               <select className="input" defaultValue={u.role} onChange={e=> updateRole(u.id, e.target.value)}>
